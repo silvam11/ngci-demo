@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ngci
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web-gateway
+  namespace: ngci
+spec:
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: web-gateway
+    spec:
+      containers:
+        - name: web-gateway
+          image: silvam11/web-gateway
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080 
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-gateway-service
+  namespace: ngci
+spec:
+  selector:
+    app: web-gateway
+  ports:
+    - protocol: "TCP"
+      # Port accessible inside cluster
+      port: 8080
+      # Port forward to inside the pod
+      #targetPort did not work with nodePort, why?
+      #targetPort: 9090
+      # Port accessible outside cluster
+      nodePort: 30001
+      #name: grpc
+  type: LoadBalancer
