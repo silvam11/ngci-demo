@@ -24,7 +24,6 @@ spec:
           ports:
             - containerPort: 8080 
 
-
 ---
 apiVersion: v1
 kind: Service
@@ -43,5 +42,87 @@ spec:
       #targetPort: 9090
       # Port accessible outside cluster
       nodePort: 30001
+      #name: grpc
+  type: LoadBalancer
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vcsa-manager
+  namespace: ngci
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: vcsa-manager
+    spec:
+      containers:
+        - name: vcsa-manager
+          image: silvam11/vcsa-manager
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vcsa-manager-service
+  namespace: ngci
+spec:
+  selector:
+    app: vcsa-manager
+  ports:
+    - protocol: "TCP"
+      # Port accessible inside cluster
+      port: 7070
+      # Port forward to inside the pod
+      #targetPort did not work with nodePort, why?
+      #targetPort: 9090
+      # Port accessible outside cluster
+      #nodePort: 30001
+      #name: grpc
+  type: LoadBalancer
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: repo-manager
+  namespace: ngci
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: repo-manager
+    spec:
+      containers:
+        - name: repo-manager
+          image: silvam11/repo-manager
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: repo-manager-service
+  namespace: ngci
+spec:
+  selector:
+    app: repo-manager
+  ports:
+    - protocol: "TCP"
+      # Port accessible inside cluster
+      port: 9090
+      # Port forward to inside the pod
+      #targetPort did not work with nodePort, why?
+      #targetPort: 9090
+      # Port accessible outside cluster
+      #nodePort: 30001
       #name: grpc
   type: LoadBalancer
