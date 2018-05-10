@@ -11,18 +11,26 @@ metadata:
   name: web-gateway
   namespace: ngci
 spec:
-  replicas: 4
+  replicas: 1
   template:
     metadata:
       labels:
         app: web-gateway
     spec:
       containers:
-        - name: web-gateway
-          image: silvam11/web-gateway
-          imagePullPolicy: Never
-          ports:
-            - containerPort: 8080 
+      - env:
+        - name: VCSA_MANAGER
+          value: http://vcsa-manager-service:7070
+        name: web-gateway
+        image: silvam11/web-gateway
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 8080 
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: 8080
+          periodSeconds: 5           
 
 ---
 apiVersion: v1
@@ -52,7 +60,7 @@ metadata:
   name: vcsa-manager
   namespace: ngci
 spec:
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -80,11 +88,10 @@ spec:
       port: 7070
       # Port forward to inside the pod
       #targetPort did not work with nodePort, why?
-      #targetPort: 9090
+      targetPort: 8080
       # Port accessible outside cluster
       #nodePort: 30001
       #name: grpc
-  type: LoadBalancer
 
 ---
 apiVersion: extensions/v1beta1
@@ -93,7 +100,7 @@ metadata:
   name: repo-manager
   namespace: ngci
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -125,4 +132,3 @@ spec:
       # Port accessible outside cluster
       #nodePort: 30001
       #name: grpc
-  type: LoadBalancer
