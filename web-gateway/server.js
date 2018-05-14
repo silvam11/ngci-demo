@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-const PORT = 8080;
+const PORT = 9080;
 const HOST = '0.0.0.0';
 
 app.get('/status', (req, res) => {

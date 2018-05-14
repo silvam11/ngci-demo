@@ -16,13 +16,6 @@ func main() {
 
 func getData(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Enpoint Test called.")
-	
-	//fmt.Println("Creating a map ...")
-	//var response = make(map[string]string)	
-//	response["color"] = "blue"
-//	response["message"] = "This a test - Mauro"
-//	response["notify"] = "false"
-//	response["format"] = "text"
 
 	repoManager := os.Getenv("REPO_MANAGER")
 	fmt.Println("REPO_MANAGER ", repoManager)

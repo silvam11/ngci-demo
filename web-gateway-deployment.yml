@@ -25,11 +25,11 @@ spec:
         image: silvam11/web-gateway
         imagePullPolicy: Never
         ports:
-          - containerPort: 8080
+          - containerPort: 9080
         readinessProbe:
           httpGet:
             path: /status
-            port: 8080
+            port: 9080
           periodSeconds: 5           
 
 ---
@@ -44,7 +44,7 @@ spec:
   ports:
     - protocol: "TCP"
       # Port accessible inside cluster
-      port: 8080
+      port: 9080
       # Port forward to inside the pod
       #targetPort did not work with nodePort, why?
       #targetPort: 9090
@@ -110,7 +110,12 @@ spec:
         app: repo-manager
     spec:
       containers:
-        - name: repo-manager
+        - env:
+          - name: AWX_USERNAME
+            value: admin
+          - name: AWX_PASSWORD
+            value: password
+          name: repo-manager
           image: silvam11/repo-manager
           imagePullPolicy: Never
           ports:
@@ -135,3 +140,27 @@ spec:
       # Port accessible outside cluster
       #nodePort: 30001
       #name: grpc
+
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: awx-api-service
+  namespace: ngci
+subsets:
+  - addresses:
+      - ip: 10.239.133.82
+    ports:
+      - port: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: awx-api-service
+  namespace: ngci
+spec:
+  ports:
+  - protocol: TCP
+    port: 6060
+    targetPort: 80
