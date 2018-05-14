@@ -4,25 +4,38 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"fmt"
+	"os"
+	"io/ioutil"
 )
 
 func main() {
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", Test)
-
-	log.Fatal(http.ListenAndServe(":8080", router))
+	http.HandleFunc("/data", getData)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func Test(w http.ResponseWriter, r *http.Request) {
-	response := HipChatResponse{Color: "yellow", Message: "This is a Test 22", Notify: "false", MessageFormat: "text"}
-	json.NewEncoder(w).Encode(response)
+func getData(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Enpoint Test called.")
+	
+	//fmt.Println("Creating a map ...")
+	//var response = make(map[string]string)	
+//	response["color"] = "blue"
+//	response["message"] = "This a test - Mauro"
+//	response["notify"] = "false"
+//	response["format"] = "text"
+
+	repoManager := os.Getenv("REPO_MANAGER")
+	fmt.Println("REPO_MANAGER ", repoManager)
+
+	resp, err := http.Get(repoManager + "colors")
+	if err != nil {
+		fmt.Println("HTTP ERROR: %s ", err)
+		panic(err)
+        }
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	fmt.Println("BODY: ", string(body))
+	json.NewEncoder(w).Encode(string(body))
 }
 
-type HipChatResponse struct {
-	Color         string `json:"color"`
-	Message       string `json:"message"`
-	Notify        string `json:"notify"`
-	MessageFormat string `json:"message_format"`
-}

@@ -29,8 +29,9 @@ app.post('/user', (req, res) => {
   }
 
   console.log("calling " + process.env.VCSA_MANAGER);
+  var url = process.env.VCSA_MANAGER + "data";
   const options = {
-    url: process.env.VCSA_MANAGER,
+    url: url,
     method: 'GET',
     headers: {
       'Accept': 'application/json'

@@ -20,12 +20,12 @@ spec:
       containers:
       - env:
         - name: VCSA_MANAGER
-          value: http://vcsa-manager-service:7070
+          value: http://vcsa-manager-service:7070/
         name: web-gateway
         image: silvam11/web-gateway
         imagePullPolicy: Never
         ports:
-          - containerPort: 8080 
+          - containerPort: 8080
         readinessProbe:
           httpGet:
             path: /status
@@ -67,7 +67,10 @@ spec:
         app: vcsa-manager
     spec:
       containers:
-        - name: vcsa-manager
+        - env:
+          - name: REPO_MANAGER
+            value: http://repo-manager-service:9090/
+          name: vcsa-manager
           image: silvam11/vcsa-manager
           imagePullPolicy: Never
           ports:
@@ -128,7 +131,7 @@ spec:
       port: 9090
       # Port forward to inside the pod
       #targetPort did not work with nodePort, why?
-      #targetPort: 9090
+      targetPort: 8000
       # Port accessible outside cluster
       #nodePort: 30001
       #name: grpc

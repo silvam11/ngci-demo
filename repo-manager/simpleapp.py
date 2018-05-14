@@ -7,10 +7,15 @@ app = Flask(__name__)
 
 start = int(round(time.time()))
 
-@app.route("/")
+@app.route("/colors")
 def get_versions():
+    response = {}
+    response["color"] = "green"
+    response["message"] = "This a test - repo-manager 1"
+    response["notify"] = "false"
+    response["format"] = "text"
 
-    return "VMware-vCenter-Server-Appliance-6.5.0.5100-7070488_OVF10.ova"
+    return str(response)
 
 if __name__ == '__main__':
     parser = optparse.OptionParser(usage="python simpleapp.py -p ")
